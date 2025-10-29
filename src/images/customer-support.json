@@ -1,0 +1,6 @@
+{
+  "softctf-customer-support": {
+    "image": "ghcr.io/miello/softctf-customer-support",
+    "tag": "5b7b5fc15c8fdf9182d359e99d33d48c97285330"
+  }
+}
