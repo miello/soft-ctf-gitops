@@ -10,7 +10,7 @@ spec:
   project: argo-cd
   source:
     path: dist/softctf-are-you-ready
-    repoURL: https://github.com/miello/soft-ctf-gitops.git
+    repoURL: https://github.com/miello/soft-ctf-gitops
     targetRevision: main
   syncPolicy:
     automated:

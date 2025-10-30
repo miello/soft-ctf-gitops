@@ -5,7 +5,7 @@ import { ChallengeNamespaceEnum } from './types/namespace'
 import { IntOrString, KubeDeployment, KubeService, Quantity } from '../imports/k8s'
 import { IngressRoute, IngressRouteSpecRoutesKind, IngressRouteSpecRoutesServicesPort } from '../imports/traefik-ingressroutes-traefik.io'
 
-const repositoryUrl = 'https://github.com/miello/soft-ctf-gitops.git'
+const repositoryUrl = 'https://github.com/miello/soft-ctf-gitops'
 const app = new App({
   yamlOutputType: YamlOutputType.FOLDER_PER_CHART_FILE_PER_RESOURCE,
   outdir: 'dist',
