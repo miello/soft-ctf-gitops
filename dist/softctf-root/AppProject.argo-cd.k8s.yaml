@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: argo-cd
+  namespace: argocd
+spec:
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  destinations:
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+    - namespace: kube-system
+      server: https://kubernetes.default.svc
+    - namespace: cert-manager
+      server: https://kubernetes.default.svc
+    - namespace: traefik
+      server: https://kubernetes.default.svc
+    - namespace: soft-ctf-are-you-ready
+      server: https://kubernetes.default.svc
+    - namespace: soft-ctf-customer-support
+      server: https://kubernetes.default.svc
+    - namespace: soft-ctf-glossary-shop
+      server: https://kubernetes.default.svc
+    - namespace: soft-ctf-guess-file-content
+      server: https://kubernetes.default.svc
+    - namespace: soft-ctf-simple-math
+      server: https://kubernetes.default.svc
+    - namespace: soft-ctf-barqr-capmoo
+      server: https://kubernetes.default.svc
+    - namespace: soft-ctf-secure-secret
+      server: https://kubernetes.default.svc
+    - namespace: soft-ctf-super-secure-secret
+      server: https://kubernetes.default.svc
+  sourceRepos:
+    - "*"

@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: are-you-ready-ingress
+  namespace: soft-ctf-are-you-ready
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`test-database-helloworld.miello.dev`)
+      services:
+        - name: are-you-ready-service
+          port: 80

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: soft-ctf-applications
+  namespace: argocd
+spec:
+  destination:
+    namespace: soft-ctf-are-you-ready
+    server: https://kubernetes.default.svc
+  project: argo-cd
+  source:
+    path: dist/softctf/are-you-ready
+    repoURL: https://github.com/miello/soft-ctf-gitops.git
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

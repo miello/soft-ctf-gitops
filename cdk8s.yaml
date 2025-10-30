@@ -2,3 +2,7 @@ language: typescript
 app: node out/main.js
 imports:
   - k8s
+  - argocd-appproject:=https://raw.githubusercontent.com/argoproj/argo-cd/refs/tags/v3.1.9/manifests/crds/appproject-crd.yaml
+  - argocd-application:=https://raw.githubusercontent.com/argoproj/argo-cd/refs/tags/v3.1.9/manifests/crds/application-crd.yaml
+  - traefik-middlewares:=https://raw.githubusercontent.com/traefik/traefik-helm-chart/refs/tags/v37.2.0/traefik-crds/crds-files/traefik/traefik.io_middlewares.yaml
+  - traefik-ingressroutes:=https://raw.githubusercontent.com/traefik/traefik-helm-chart/refs/tags/v37.2.0/traefik-crds/crds-files/traefik/traefik.io_ingressroutes.yaml
