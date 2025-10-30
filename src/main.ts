@@ -48,7 +48,7 @@ new Application(appChart, 'argo-cd-application', {
     source: {
       repoUrl: repositoryUrl,
       targetRevision: 'main',
-      path: 'dist/softctf/are-you-ready',
+      path: 'dist/softctf-are-you-ready',
     },
     syncPolicy: {
       syncOptions: ['CreateNamespace=true'],

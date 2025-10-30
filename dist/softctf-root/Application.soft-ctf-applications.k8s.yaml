@@ -9,7 +9,7 @@ spec:
     server: https://kubernetes.default.svc
   project: argo-cd
   source:
-    path: dist/softctf/are-you-ready
+    path: dist/softctf-are-you-ready
     repoURL: https://github.com/miello/soft-ctf-gitops.git
     targetRevision: main
   syncPolicy:
