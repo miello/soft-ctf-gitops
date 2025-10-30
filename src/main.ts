@@ -119,10 +119,12 @@ new KubeService(AreYouReadyChart, 'are-you-ready', {
     },
     ports: [
       {
+        name: 'http',
         port: 80,
         targetPort: IntOrString.fromNumber(80),
       },
       {
+        name: 'https',
         port: 443,
         targetPort: IntOrString.fromNumber(443),
       }
