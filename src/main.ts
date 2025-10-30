@@ -15,7 +15,7 @@ const appChart = new Chart(app, 'softctf-root')
 
 const mainProject = new AppProject(appChart, 'argo-cd-project', {
   metadata: {
-    name: 'argo-cd',
+    name: 'argocd',
     namespace: 'argocd',
   },
   spec: {
@@ -36,7 +36,7 @@ const mainProject = new AppProject(appChart, 'argo-cd-project', {
 
 new Application(appChart, 'argo-cd-application', {
   metadata: {
-    name: 'soft-ctf-applications',
+    name: 'soft-ctf-are-you-ready',
     namespace: 'argocd',
   },
   spec: {

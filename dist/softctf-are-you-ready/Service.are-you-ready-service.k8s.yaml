@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: are-you-ready-service
-  namespace: soft-ctf-are-you-ready
+  namespace: softctf-are-you-ready
 spec:
   ports:
     - port: 80

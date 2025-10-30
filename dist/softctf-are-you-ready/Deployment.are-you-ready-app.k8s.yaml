@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: are-you-ready-app
-  namespace: soft-ctf-are-you-ready
+  namespace: softctf-are-you-ready
 spec:
   replicas: 1
   selector:
