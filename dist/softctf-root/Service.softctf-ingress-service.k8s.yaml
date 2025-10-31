@@ -29,5 +29,7 @@ spec:
       port: 8085
       protocol: TCP
       targetPort: 8085
-  selector: {}
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
   type: LoadBalancer

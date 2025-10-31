@@ -54,7 +54,7 @@ new ConfigMap(appChart, 'softctf-tcp-ingress-configmap', {
   }
 })
 
-new Service(appChart, 'softctf-ingress-service', {
+const ingressService = new Service(appChart, 'softctf-ingress-service', {
   metadata: {
     name: 'softctf-ingress-service',
     namespace: GlobalNamespaceEnum.INGRESS_NGINX,
@@ -97,6 +97,9 @@ new Service(appChart, 'softctf-ingress-service', {
     }
   ]
 })
+
+ingressService.selectLabel( 'app.kubernetes.io/name', 'ingress-nginx' )
+ingressService.selectLabel( 'app.kubernetes.io/part-of', 'ingress-nginx' )
 
 app.synth()
 
