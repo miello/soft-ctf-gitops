@@ -125,7 +125,7 @@ export const applySuperSecureSecretTemplate = (app: App, rootChart: Chart, proje
       ports: [
         {
           name: 'tcp',
-          port: 8082,
+          port: 8083,
           targetPort: IntOrString.fromNumber(1337),
         },
       ],

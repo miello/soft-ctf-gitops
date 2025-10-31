@@ -125,7 +125,7 @@ export const applySimpleMathTemplate = (app: App, rootChart: Chart, projectName:
       ports: [
         {
           name: 'tcp',
-          port: 8082,
+          port: 8084,
           targetPort: IntOrString.fromNumber(1337),
         },
       ],

@@ -6,7 +6,7 @@ metadata:
 spec:
   ports:
     - name: tcp
-      port: 8082
+      port: 8085
       targetPort: 1337
   selector:
     app: barqr-capmoo-app

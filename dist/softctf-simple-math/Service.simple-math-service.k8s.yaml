@@ -6,7 +6,7 @@ metadata:
 spec:
   ports:
     - name: tcp
-      port: 8082
+      port: 8084
       targetPort: 1337
   selector:
     app: simple-math-app

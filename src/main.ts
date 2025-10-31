@@ -10,7 +10,6 @@ import { applySecureSecretTemplate } from './templates/secure-secret'
 import { applySimpleMathTemplate } from './templates/simple-math'
 import { applySuperSecureSecretTemplate } from './templates/super-secure-secret'
 
-const repositoryUrl = 'https://github.com/miello/soft-ctf-gitops'
 const app = new App({
   yamlOutputType: YamlOutputType.FOLDER_PER_CHART_FILE_PER_RESOURCE,
   outdir: 'dist',

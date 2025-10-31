@@ -129,7 +129,7 @@ export const applyBarQRCapmooTemplate = (
       ports: [
         {
           name: 'tcp',
-          port: 8082,
+          port: 8085,
           targetPort: IntOrString.fromNumber(1337),
         },
       ],
