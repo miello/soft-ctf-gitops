@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-softctf
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  name: guess-file-content-ingress
+  namespace: softctf
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: softctf-guess-file-content.miello.dev
+      http:
+        paths:
+          - backend:
+              service:
+                name: guess-file-content-service
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - softctf-guess-file-content.miello.dev
+      secretName: guess-file-content-tls

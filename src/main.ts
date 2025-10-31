@@ -111,6 +111,18 @@ const ingressService = new Service(appChart, 'softctf-ingress-service', {
   type: ServiceType.LOAD_BALANCER,
   ports: [
     {
+      name: 'http',
+      port: 80,
+      targetPort: 80,
+      protocol: Protocol.TCP,
+    },
+    {
+      name: 'https',
+      port: 443,
+      targetPort: 443,
+      protocol: Protocol.TCP,
+    },
+    {
       port: 8081,
       targetPort: 8081,
       name: 'are-you-real',

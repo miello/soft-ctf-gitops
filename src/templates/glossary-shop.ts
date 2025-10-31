@@ -182,28 +182,29 @@ export const applyGlossaryShopTemplate = (
     ],
   })
 
-  // new Ingress(chart, 'glossary-shop-ingress', {
-  //   metadata: {
-  //     name: 'glossary-shop-ingress',
-  //     namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
-  //     annotations: {
-  //       'cert-manager.io/cluster-issuer': 'letsencrypt-softctf',
-  //       'nginx.ingress.kubernetes.io/force-ssl-redirect': 'true',
-  //     }
-  //   },
-  //   tls: [
-  //     {
-  //       hosts: ['softctf-glossary-shop.miello.dev'],
-  //       secret: TlsSecret.fromSecretName(chart, 'glossary-shop-tls', 'glossary-shop-tls'),
-  //     },
-  //   ],
-  //   rules: [
-  //     {
-  //       host: 'softctf-glossary-shop.miello.dev',
-  //       backend: IngressBackend.fromService(service),
-  //     },
-  //   ],
-  // })
+  new Ingress(chart, 'glossary-shop-ingress', {
+    metadata: {
+      name: 'glossary-shop-ingress',
+      namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
+      annotations: {
+        'cert-manager.io/cluster-issuer': 'letsencrypt-softctf',
+        'nginx.ingress.kubernetes.io/force-ssl-redirect': 'true',
+      }
+    },
+    className: 'nginx',
+    tls: [
+      {
+        hosts: ['softctf-glossary-shop.miello.dev'],
+        secret: TlsSecret.fromSecretName(chart, 'glossary-shop-tls', 'glossary-shop-tls'),
+      },
+    ],
+    rules: [
+      {
+        host: 'softctf-glossary-shop.miello.dev',
+        backend: IngressBackend.fromService(service),
+      },
+    ],
+  })
 
   return {
     service,
