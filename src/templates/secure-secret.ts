@@ -78,7 +78,6 @@ export const applySecureSecretTemplate = (
       }
     }],
     dockerRegistryAuth: Secret.fromSecretName(chart, 'regcred', 'regcred'),
-    restartPolicy: RestartPolicy.ON_FAILURE,
   })
 
   return {

@@ -87,7 +87,6 @@ export const applyBarQRCapmooTemplate = (
       },
     ],
     dockerRegistryAuth: Secret.fromSecretName(chart, 'regcred', 'regcred'),
-    restartPolicy: RestartPolicy.ON_FAILURE,
   })
 
   return {

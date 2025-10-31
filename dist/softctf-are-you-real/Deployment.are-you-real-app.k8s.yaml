@@ -47,7 +47,7 @@ spec:
       hostNetwork: false
       imagePullSecrets:
         - name: regcred
-      restartPolicy: OnFailure
+      restartPolicy: Always
       securityContext:
         fsGroupChangePolicy: Always
         runAsNonRoot: true
