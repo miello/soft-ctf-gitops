@@ -89,10 +89,14 @@ export const applyGlossaryShopTemplate = (
           },
         },
         securityContext: {
+          ensureNonRoot: false,
           readOnlyRootFilesystem: false,
         },
       },
     ],
+    securityContext: {
+      ensureNonRoot: false,
+    },
     dockerRegistryAuth: dockerAuthSecret
   })
 
