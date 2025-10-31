@@ -113,10 +113,7 @@ export const applySuperSecureSecretTemplate = (app: App, rootChart: Chart, proje
   new KubeService(chart, 'super-secure-secret-service', {
     metadata: {
       name: 'super-secure-secret-service',
-      namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
-      annotations: {
-        
-      }
+      namespace: ChallengeNamespaceEnum.SOFTCTF_SUPER_SECURE_SECRET,
     },
     spec: {
       selector: {
