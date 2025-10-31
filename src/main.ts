@@ -69,21 +69,21 @@ const superSecureSecretResult = applySuperSecureSecretTemplate(
   appChart,
   mainProject.name,
 )
-const customerSupportResult = applyCustomerSupportTemplate(
-  app,
-  appChart,
-  mainProject.name,
-)
-const guessFileContentResult = applyGuessFileContentTemplate(
-  app,
-  appChart,
-  mainProject.name,
-)
-const glossaryShopResult = applyGlossaryShopTemplate(
-  app,
-  appChart,
-  mainProject.name,
-)
+// const customerSupportResult = applyCustomerSupportTemplate(
+//   app,
+//   appChart,
+//   mainProject.name,
+// )
+// const guessFileContentResult = applyGuessFileContentTemplate(
+//   app,
+//   appChart,
+//   mainProject.name,
+// )
+// const glossaryShopResult = applyGlossaryShopTemplate(
+//   app,
+//   appChart,
+//   mainProject.name,
+// )
 
 new ConfigMap(appChart, 'softctf-tcp-ingress-configmap', {
   metadata: {
