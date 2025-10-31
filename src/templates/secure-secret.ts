@@ -6,34 +6,34 @@ import {
   KubeService,
   Quantity,
 } from '../../imports/k8s'
-import imageInfo from '../images/are-you-real.json'
+import imageInfo from '../images/secure-secret.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
 import { Secret } from 'cdk8s-plus-33'
 
-const image = imageInfo['softctf-are-you-real']['image']
-const tag = imageInfo['softctf-are-you-real']['tag']
+const image = imageInfo['softctf-secure-secret']['image']
+const tag = imageInfo['softctf-secure-secret']['tag']
 
-export const applyAreYouRealTemplate = (
+export const applySecureSecretTemplate = (
   app: App,
   rootChart: Chart,
   projectName: string,
 ) => {
-  new Application(rootChart, 'argo-cd-application-are-you-real', {
+  new Application(rootChart, 'argo-cd-application-secure-secret', {
     metadata: {
-      name: 'softctf-are-you-real',
+      name: 'softctf-secure-secret',
       namespace: 'argocd',
     },
     spec: {
       destination: {
-        namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+        namespace: ChallengeNamespaceEnum.SOFTCTF_SECURE_SECRET,
         server: 'https://kubernetes.default.svc',
       },
       project: projectName,
       source: {
         repoUrl: REPOSITORY_URL,
         targetRevision: 'main',
-        path: 'dist/softctf-are-you-real',
+        path: 'dist/softctf-secure-secret',
       },
       syncPolicy: {
         syncOptions: ['CreateNamespace=true'],
@@ -45,35 +45,35 @@ export const applyAreYouRealTemplate = (
     },
   })
 
-  const chart = new Chart(app, 'softctf-are-you-real', {
+  const chart = new Chart(app, 'softctf-secure-secret', {
     namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
   })
 
-  new Secret(chart, 'are-you-real-secret', {
+  new Secret(chart, 'secure-secret-secret', {
     metadata: {
-      name: 'are-you-real-secret',
+      name: 'secure-secret-secret',
     },
     immutable: true,
     stringData: {
-      FLAG: 'softctf{wElcoME_To_5oftCTF_h@Ve_Fun}',
+      FLAG: 'softctf{MOdU1o_rE<OVer_(oeFfIcIeNT}',
     },
   })
 
-  new KubeDeployment(chart, 'are-you-real-deployment', {
+  new KubeDeployment(chart, 'secure-secret-deployment', {
     metadata: {
-      name: 'are-you-real-app',
+      name: 'secure-secret-app',
     },
     spec: {
       selector: {
         matchLabels: {
-          app: 'are-you-real-app',
+          app: 'secure-secret-app',
         },
       },
       replicas: 2,
       template: {
         metadata: {
           labels: {
-            app: 'are-you-real-app',
+            app: 'secure-secret-app',
           },
         },
         spec: {
@@ -84,12 +84,12 @@ export const applyAreYouRealTemplate = (
           ],
           containers: [
             {
-              name: 'are-you-real-app',
+              name: 'secure-secret-app',
               image: `${image}:${tag}`,
               envFrom: [
                 {
                   secretRef: {
-                    name: 'are-you-real-secret',
+                    name: 'secure-secret-secret',
                   },
                 },
               ],
@@ -116,19 +116,20 @@ export const applyAreYouRealTemplate = (
     },
   })
 
-  new KubeService(chart, 'are-you-real-service', {
+  new KubeService(chart, 'secure-secret-service', {
     metadata: {
-      name: 'are-you-real-service',
-      namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+      name: 'secure-secret-service',
+      namespace: ChallengeNamespaceEnum.SOFTCTF_SECURE_SECRET,
+      annotations: {},
     },
     spec: {
       selector: {
-        app: 'are-you-real-app',
+        app: 'secure-secret-app',
       },
       ports: [
         {
           name: 'tcp',
-          port: 8081,
+          port: 8082,
           targetPort: IntOrString.fromNumber(1337),
         },
       ],

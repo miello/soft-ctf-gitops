@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-math-app
+  namespace: softctf-simple-math
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: simple-math-app
+  template:
+    metadata:
+      labels:
+        app: simple-math-app
+    spec:
+      containers:
+        - envFrom:
+            - secretRef:
+                name: simple-math-secret
+          image: ghcr.io/miello/softctf-simple-math:5b7b5fc15c8fdf9182d359e99d33d48c97285330
+          imagePullPolicy: IfNotPresent
+          name: simple-math-app
+          ports:
+            - containerPort: 1337
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+      imagePullSecrets:
+        - name: regcred

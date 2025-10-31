@@ -6,34 +6,30 @@ import {
   KubeService,
   Quantity,
 } from '../../imports/k8s'
-import imageInfo from '../images/are-you-real.json'
+import imageInfo from '../images/simple-math.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
 import { Secret } from 'cdk8s-plus-33'
 
-const image = imageInfo['softctf-are-you-real']['image']
-const tag = imageInfo['softctf-are-you-real']['tag']
+const image = imageInfo['softctf-simple-math']['image']
+const tag = imageInfo['softctf-simple-math']['tag']
 
-export const applyAreYouRealTemplate = (
-  app: App,
-  rootChart: Chart,
-  projectName: string,
-) => {
-  new Application(rootChart, 'argo-cd-application-are-you-real', {
+export const applySimpleMathTemplate = (app: App, rootChart: Chart, projectName: string) => {
+  new Application(rootChart, 'argo-cd-application-simple-math', {
     metadata: {
-      name: 'softctf-are-you-real',
+      name: 'softctf-simple-math',
       namespace: 'argocd',
     },
     spec: {
       destination: {
-        namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+        namespace: ChallengeNamespaceEnum.SOFTCTF_SIMPLE_MATH,
         server: 'https://kubernetes.default.svc',
       },
       project: projectName,
       source: {
         repoUrl: REPOSITORY_URL,
         targetRevision: 'main',
-        path: 'dist/softctf-are-you-real',
+        path: 'dist/softctf-simple-math',
       },
       syncPolicy: {
         syncOptions: ['CreateNamespace=true'],
@@ -45,54 +41,52 @@ export const applyAreYouRealTemplate = (
     },
   })
 
-  const chart = new Chart(app, 'softctf-are-you-real', {
-    namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+  const chart = new Chart(app, 'softctf-simple-math', {
+    namespace: ChallengeNamespaceEnum.SOFTCTF_SIMPLE_MATH,
   })
 
-  new Secret(chart, 'are-you-real-secret', {
+  new Secret(chart, 'simple-math-secret', {
     metadata: {
-      name: 'are-you-real-secret',
+      name: 'simple-math-secret',
     },
     immutable: true,
     stringData: {
-      FLAG: 'softctf{wElcoME_To_5oftCTF_h@Ve_Fun}',
+      FLAG: 'softctf{MAt#_is_REal!Y_$iMP!e_RIGHT}',
     },
   })
 
-  new KubeDeployment(chart, 'are-you-real-deployment', {
+  new KubeDeployment(chart, 'simple-math-deployment', {
     metadata: {
-      name: 'are-you-real-app',
+      name: 'simple-math-app',
     },
     spec: {
       selector: {
         matchLabels: {
-          app: 'are-you-real-app',
+          app: 'simple-math-app',
         },
       },
       replicas: 2,
       template: {
         metadata: {
           labels: {
-            app: 'are-you-real-app',
+            app: 'simple-math-app',
           },
         },
         spec: {
           imagePullSecrets: [
             {
               name: 'regcred',
-            },
+            }
           ],
           containers: [
             {
-              name: 'are-you-real-app',
+              name: 'simple-math-app',
               image: `${image}:${tag}`,
-              envFrom: [
-                {
-                  secretRef: {
-                    name: 'are-you-real-secret',
-                  },
-                },
-              ],
+              envFrom: [{
+                secretRef: {
+                  name: 'simple-math-secret',
+                }
+              }],
               ports: [
                 {
                   containerPort: 1337,
@@ -116,19 +110,22 @@ export const applyAreYouRealTemplate = (
     },
   })
 
-  new KubeService(chart, 'are-you-real-service', {
+  new KubeService(chart, 'simple-math-service', {
     metadata: {
-      name: 'are-you-real-service',
+      name: 'simple-math-service',
       namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+      annotations: {
+        
+      }
     },
     spec: {
       selector: {
-        app: 'are-you-real-app',
+        app: 'simple-math-app',
       },
       ports: [
         {
           name: 'tcp',
-          port: 8081,
+          port: 8082,
           targetPort: IntOrString.fromNumber(1337),
         },
       ],
@@ -136,3 +133,4 @@ export const applyAreYouRealTemplate = (
     },
   })
 }
+ 

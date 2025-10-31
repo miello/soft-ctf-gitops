@@ -6,34 +6,30 @@ import {
   KubeService,
   Quantity,
 } from '../../imports/k8s'
-import imageInfo from '../images/are-you-real.json'
+import imageInfo from '../images/super-secure-secret.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
 import { Secret } from 'cdk8s-plus-33'
 
-const image = imageInfo['softctf-are-you-real']['image']
-const tag = imageInfo['softctf-are-you-real']['tag']
+const image = imageInfo['softctf-super-secure-secret']['image']
+const tag = imageInfo['softctf-super-secure-secret']['tag']
 
-export const applyAreYouRealTemplate = (
-  app: App,
-  rootChart: Chart,
-  projectName: string,
-) => {
-  new Application(rootChart, 'argo-cd-application-are-you-real', {
+export const applySuperSecureSecretTemplate = (app: App, rootChart: Chart, projectName: string) => {
+  new Application(rootChart, 'argo-cd-application-super-secure-secret', {
     metadata: {
-      name: 'softctf-are-you-real',
+      name: 'softctf-super-secure-secret',
       namespace: 'argocd',
     },
     spec: {
       destination: {
-        namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+        namespace: ChallengeNamespaceEnum.SOFTCTF_SUPER_SECURE_SECRET,
         server: 'https://kubernetes.default.svc',
       },
       project: projectName,
       source: {
         repoUrl: REPOSITORY_URL,
         targetRevision: 'main',
-        path: 'dist/softctf-are-you-real',
+        path: 'dist/softctf-super-secure-secret',
       },
       syncPolicy: {
         syncOptions: ['CreateNamespace=true'],
@@ -45,54 +41,52 @@ export const applyAreYouRealTemplate = (
     },
   })
 
-  const chart = new Chart(app, 'softctf-are-you-real', {
-    namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+  const chart = new Chart(app, 'softctf-super-secure-secret', {
+    namespace: ChallengeNamespaceEnum.SOFTCTF_SUPER_SECURE_SECRET,
   })
 
-  new Secret(chart, 'are-you-real-secret', {
+  new Secret(chart, 'super-secure-secret-secret', {
     metadata: {
-      name: 'are-you-real-secret',
+      name: 'super-secure-secret-secret',
     },
     immutable: true,
     stringData: {
-      FLAG: 'softctf{wElcoME_To_5oftCTF_h@Ve_Fun}',
+      FLAG: 'softctf{Sh4mir_se(rET_SchEMe_KEy_LeaK4gE}',
     },
   })
 
-  new KubeDeployment(chart, 'are-you-real-deployment', {
+  new KubeDeployment(chart, 'super-secure-secret-deployment', {
     metadata: {
-      name: 'are-you-real-app',
+      name: 'super-secure-secret-app',
     },
     spec: {
       selector: {
         matchLabels: {
-          app: 'are-you-real-app',
+          app: 'super-secure-secret-app',
         },
       },
       replicas: 2,
       template: {
         metadata: {
           labels: {
-            app: 'are-you-real-app',
+            app: 'super-secure-secret-app',
           },
         },
         spec: {
           imagePullSecrets: [
             {
               name: 'regcred',
-            },
+            }
           ],
           containers: [
             {
-              name: 'are-you-real-app',
+              name: 'super-secure-secret-app',
               image: `${image}:${tag}`,
-              envFrom: [
-                {
-                  secretRef: {
-                    name: 'are-you-real-secret',
-                  },
-                },
-              ],
+              envFrom: [{
+                secretRef: {
+                  name: 'super-secure-secret-secret',
+                }
+              }],
               ports: [
                 {
                   containerPort: 1337,
@@ -116,19 +110,22 @@ export const applyAreYouRealTemplate = (
     },
   })
 
-  new KubeService(chart, 'are-you-real-service', {
+  new KubeService(chart, 'super-secure-secret-service', {
     metadata: {
-      name: 'are-you-real-service',
+      name: 'super-secure-secret-service',
       namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+      annotations: {
+        
+      }
     },
     spec: {
       selector: {
-        app: 'are-you-real-app',
+        app: 'super-secure-secret-app',
       },
       ports: [
         {
           name: 'tcp',
-          port: 8081,
+          port: 8082,
           targetPort: IntOrString.fromNumber(1337),
         },
       ],
@@ -136,3 +133,4 @@ export const applyAreYouRealTemplate = (
     },
   })
 }
+ 

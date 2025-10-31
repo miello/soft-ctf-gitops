@@ -6,34 +6,34 @@ import {
   KubeService,
   Quantity,
 } from '../../imports/k8s'
-import imageInfo from '../images/are-you-real.json'
+import imageInfo from '../images/barqr-capmoo.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
 import { Secret } from 'cdk8s-plus-33'
 
-const image = imageInfo['softctf-are-you-real']['image']
-const tag = imageInfo['softctf-are-you-real']['tag']
+const image = imageInfo['softctf-barqr-capmoo']['image']
+const tag = imageInfo['softctf-barqr-capmoo']['tag']
 
-export const applyAreYouRealTemplate = (
+export const applyBarQRCapmooTemplate = (
   app: App,
   rootChart: Chart,
   projectName: string,
 ) => {
-  new Application(rootChart, 'argo-cd-application-are-you-real', {
+  new Application(rootChart, 'argo-cd-application-barqr-capmoo', {
     metadata: {
-      name: 'softctf-are-you-real',
+      name: 'softctf-barqr-capmoo',
       namespace: 'argocd',
     },
     spec: {
       destination: {
-        namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+        namespace: ChallengeNamespaceEnum.SOFTCTF_BARQR_CAPMOO,
         server: 'https://kubernetes.default.svc',
       },
       project: projectName,
       source: {
         repoUrl: REPOSITORY_URL,
         targetRevision: 'main',
-        path: 'dist/softctf-are-you-real',
+        path: 'dist/softctf-barqr-capmoo',
       },
       syncPolicy: {
         syncOptions: ['CreateNamespace=true'],
@@ -45,35 +45,35 @@ export const applyAreYouRealTemplate = (
     },
   })
 
-  const chart = new Chart(app, 'softctf-are-you-real', {
-    namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+  const chart = new Chart(app, 'softctf-barqr-capmoo', {
+    namespace: ChallengeNamespaceEnum.SOFTCTF_BARQR_CAPMOO,
   })
 
-  new Secret(chart, 'are-you-real-secret', {
+  new Secret(chart, 'barqr-capmoo-secret', {
     metadata: {
-      name: 'are-you-real-secret',
+      name: 'barqr-capmoo-secret',
     },
     immutable: true,
     stringData: {
-      FLAG: 'softctf{wElcoME_To_5oftCTF_h@Ve_Fun}',
+      FLAG: 'softctf{Bar[0De_anD_qRcode_PUZ2liNg}',
     },
   })
 
-  new KubeDeployment(chart, 'are-you-real-deployment', {
+  new KubeDeployment(chart, 'barqr-capmoo-deployment', {
     metadata: {
-      name: 'are-you-real-app',
+      name: 'barqr-capmoo-app',
     },
     spec: {
       selector: {
         matchLabels: {
-          app: 'are-you-real-app',
+          app: 'barqr-capmoo-app',
         },
       },
       replicas: 2,
       template: {
         metadata: {
           labels: {
-            app: 'are-you-real-app',
+            app: 'barqr-capmoo-app',
           },
         },
         spec: {
@@ -84,12 +84,12 @@ export const applyAreYouRealTemplate = (
           ],
           containers: [
             {
-              name: 'are-you-real-app',
+              name: 'barqr-capmoo-app',
               image: `${image}:${tag}`,
               envFrom: [
                 {
                   secretRef: {
-                    name: 'are-you-real-secret',
+                    name: 'barqr-capmoo-secret',
                   },
                 },
               ],
@@ -116,19 +116,20 @@ export const applyAreYouRealTemplate = (
     },
   })
 
-  new KubeService(chart, 'are-you-real-service', {
+  new KubeService(chart, 'barqr-capmoo-service', {
     metadata: {
-      name: 'are-you-real-service',
+      name: 'barqr-capmoo-service',
       namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+      annotations: {},
     },
     spec: {
       selector: {
-        app: 'are-you-real-app',
+        app: 'barqr-capmoo-app',
       },
       ports: [
         {
           name: 'tcp',
-          port: 8081,
+          port: 8082,
           targetPort: IntOrString.fromNumber(1337),
         },
       ],

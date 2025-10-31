@@ -5,6 +5,10 @@ import { ChallengeNamespaceEnum } from './types/namespace'
 import { IntOrString, KubeDeployment, KubeService, Quantity } from '../imports/k8s'
 import { IngressRoute, IngressRouteSpecRoutesKind, IngressRouteSpecRoutesServicesPort } from '../imports/traefik-ingressroutes-traefik.io'
 import { applyAreYouRealTemplate } from './templates/are-you-real'
+import { applyBarQRCapmooTemplate } from './templates/barqr-capmoo'
+import { applySecureSecretTemplate } from './templates/secure-secret'
+import { applySimpleMathTemplate } from './templates/simple-math'
+import { applySuperSecureSecretTemplate } from './templates/super-secure-secret'
 
 const repositoryUrl = 'https://github.com/miello/soft-ctf-gitops'
 const app = new App({
@@ -36,5 +40,9 @@ const mainProject = new AppProject(appChart, 'argo-cd-project', {
 })
 
 applyAreYouRealTemplate(app, appChart, mainProject.name)
+applyBarQRCapmooTemplate(app, appChart, mainProject.name)
+applySecureSecretTemplate(app, appChart, mainProject.name)
+applySimpleMathTemplate(app, appChart, mainProject.name)
+applySuperSecureSecretTemplate(app, appChart, mainProject.name)
 
 app.synth()
