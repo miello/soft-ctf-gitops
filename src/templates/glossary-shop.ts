@@ -77,6 +77,9 @@ export const applyGlossaryShopTemplate = (
         image: `${dbImage}:${dbTag}`,
         name: 'glossary-shop-db',
         ports: [{ number: 5432 }],
+        envFrom: [
+          Env.fromSecret(dbSecret),
+        ],
         imagePullPolicy: ImagePullPolicy.IF_NOT_PRESENT,
         resources: {
           cpu: {

@@ -23,7 +23,10 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-        - image: ghcr.io/miello/softctf-glossary-shop-db:36fcf29144f324e003cc2ca3843e22674052559e
+        - envFrom:
+            - secretRef:
+                name: softctf-glossary-shop-glossary-shop-db-secret-c8a35f0f
+          image: ghcr.io/miello/softctf-glossary-shop-db:36fcf29144f324e003cc2ca3843e22674052559e
           imagePullPolicy: IfNotPresent
           name: glossary-shop-db
           ports:
