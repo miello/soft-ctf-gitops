@@ -1,10 +1,10 @@
 {
   "softctf-glossary-shop": {
     "image": "ghcr.io/miello/softctf-glossary-shop",
-    "tag": "5b7b5fc15c8fdf9182d359e99d33d48c97285330"
+    "tag": "36fcf29144f324e003cc2ca3843e22674052559e"
   },
   "softctf-glossary-shop-db": {
     "image": "ghcr.io/miello/softctf-glossary-shop-db",
-    "tag": "5b7b5fc15c8fdf9182d359e99d33d48c97285330"
+    "tag": "36fcf29144f324e003cc2ca3843e22674052559e"
   }
 }
