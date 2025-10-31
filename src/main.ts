@@ -10,6 +10,7 @@ import { ConfigMap, Protocol, Service, ServiceType } from 'cdk8s-plus-33'
 import { ClusterIssuer } from '../imports/cert-manager-clusterissuer-cert-manager.io'
 import { applyGuessFileContentTemplate } from './templates/guess-file-content'
 import { applyCustomerSupportTemplate } from './templates/customer-support'
+import { applyGlossaryShopTemplate } from './templates/glossary-shop'
 
 const app = new App({
   yamlOutputType: YamlOutputType.FOLDER_PER_CHART_FILE_PER_RESOURCE,
@@ -74,6 +75,11 @@ const customerSupportResult = applyCustomerSupportTemplate(
   mainProject.name,
 )
 const guessFileContentResult = applyGuessFileContentTemplate(
+  app,
+  appChart,
+  mainProject.name,
+)
+const glossaryShopResult = applyGlossaryShopTemplate(
   app,
   appChart,
   mainProject.name,

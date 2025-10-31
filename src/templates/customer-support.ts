@@ -99,7 +99,7 @@ export const applyCustomerSupportTemplate = (
       {
         port: 80,
         targetPort: 80,
-        name: 'tcp',
+        name: 'http',
       },
     ],
   })
