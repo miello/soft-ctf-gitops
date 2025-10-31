@@ -1,15 +1,9 @@
-import { App, Chart } from 'cdk8s'
-import { ChallengeNamespaceEnum } from '../types/namespace'
-import {
-  IntOrString,
-  KubeDeployment,
-  KubeService,
-  Quantity,
-} from '../../imports/k8s'
+import { App, Chart, Size } from 'cdk8s'
+import { GlobalNamespaceEnum } from '../types/namespace'
 import imageInfo from '../images/secure-secret.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
-import { Secret } from 'cdk8s-plus-33'
+import { Secret, Deployment, Service, ServiceType, ImagePullPolicy, Cpu, RestartPolicy, Env } from 'cdk8s-plus-33'
 
 const image = imageInfo['softctf-secure-secret']['image']
 const tag = imageInfo['softctf-secure-secret']['tag']
@@ -26,7 +20,7 @@ export const applySecureSecretTemplate = (
     },
     spec: {
       destination: {
-        namespace: ChallengeNamespaceEnum.SOFTCTF_SECURE_SECRET,
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
         server: 'https://kubernetes.default.svc',
       },
       project: projectName,
@@ -46,10 +40,10 @@ export const applySecureSecretTemplate = (
   })
 
   const chart = new Chart(app, 'softctf-secure-secret', {
-    namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+    namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
   })
 
-  new Secret(chart, 'secure-secret-secret', {
+  const envSecret = new Secret(chart, 'secure-secret-secret', {
     metadata: {
       name: 'secure-secret-secret',
     },
@@ -59,81 +53,49 @@ export const applySecureSecretTemplate = (
     },
   })
 
-  new KubeDeployment(chart, 'secure-secret-deployment', {
+  const kubeDeployment = new Deployment(chart, 'secure-secret-deployment', {
     metadata: {
       name: 'secure-secret-app',
     },
-    spec: {
-      selector: {
-        matchLabels: {
-          app: 'secure-secret-app',
+    replicas: 3,
+    containers: [{
+      image: `${image}:${tag}`,
+      name: 'secure-secret-app',
+      ports: [{ number: 1337 }],
+      imagePullPolicy: ImagePullPolicy.IF_NOT_PRESENT,
+      envFrom: [
+        Env.fromSecret(envSecret)
+      ],
+      resources: {
+        cpu: {
+          limit: Cpu.millis(100),
+          request: Cpu.millis(50),
         },
-      },
-      replicas: 2,
-      template: {
-        metadata: {
-          labels: {
-            app: 'secure-secret-app',
-          },
+        memory: {
+          limit: Size.mebibytes(128),
+          request: Size.mebibytes(64),
         },
-        spec: {
-          imagePullSecrets: [
-            {
-              name: 'regcred',
-            },
-          ],
-          containers: [
-            {
-              name: 'secure-secret-app',
-              image: `${image}:${tag}`,
-              envFrom: [
-                {
-                  secretRef: {
-                    name: 'secure-secret-secret',
-                  },
-                },
-              ],
-              ports: [
-                {
-                  containerPort: 1337,
-                },
-              ],
-              imagePullPolicy: 'IfNotPresent',
-              resources: {
-                limits: {
-                  cpu: Quantity.fromString('100m'),
-                  memory: Quantity.fromString('128Mi'),
-                },
-                requests: {
-                  cpu: Quantity.fromString('50m'),
-                  memory: Quantity.fromString('64Mi'),
-                },
-              },
-            },
-          ],
-        },
-      },
-    },
+      }
+    }],
+    dockerRegistryAuth: Secret.fromSecretName(chart, 'regcred', 'regcred'),
+    restartPolicy: RestartPolicy.ON_FAILURE,
   })
 
-  new KubeService(chart, 'secure-secret-service', {
-    metadata: {
-      name: 'secure-secret-service',
-      namespace: ChallengeNamespaceEnum.SOFTCTF_SECURE_SECRET,
-      annotations: {},
-    },
-    spec: {
-      selector: {
-        app: 'secure-secret-app',
+  return {
+    service: new Service(chart, 'secure-secret-service', {
+      metadata: {
+        name: 'secure-secret-service',
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
       },
+      type: ServiceType.CLUSTER_IP,
+      selector: kubeDeployment,
       ports: [
         {
-          name: 'tcp',
           port: 8082,
-          targetPort: IntOrString.fromNumber(1337),
-        },
+          targetPort: 1337,
+          name: 'tcp',
+        }
       ],
-      type: 'NodePort',
-    },
-  })
+    })
+  }
 }

@@ -16,21 +16,9 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: traefik
       server: https://kubernetes.default.svc
-    - namespace: softctf-are-you-real
+    - namespace: ingress-nginx
       server: https://kubernetes.default.svc
-    - namespace: softctf-customer-support
-      server: https://kubernetes.default.svc
-    - namespace: softctf-glossary-shop
-      server: https://kubernetes.default.svc
-    - namespace: softctf-guess-file-content
-      server: https://kubernetes.default.svc
-    - namespace: softctf-simple-math
-      server: https://kubernetes.default.svc
-    - namespace: softctf-barqr-capmoo
-      server: https://kubernetes.default.svc
-    - namespace: softctf-secure-secret
-      server: https://kubernetes.default.svc
-    - namespace: softctf-super-secure-secret
+    - namespace: softctf
       server: https://kubernetes.default.svc
   sourceRepos:
     - "*"

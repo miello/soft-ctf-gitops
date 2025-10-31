@@ -1,15 +1,18 @@
-import { App, Chart } from 'cdk8s'
-import { ChallengeNamespaceEnum } from '../types/namespace'
-import {
-  IntOrString,
-  KubeDeployment,
-  KubeService,
-  Quantity,
-} from '../../imports/k8s'
+import { App, Chart, Size } from 'cdk8s'
+import { GlobalNamespaceEnum } from '../types/namespace'
 import imageInfo from '../images/barqr-capmoo.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
-import { Secret } from 'cdk8s-plus-33'
+import {
+  Cpu,
+  Deployment,
+  Env,
+  ImagePullPolicy,
+  RestartPolicy,
+  Secret,
+  Service,
+  ServiceType,
+} from 'cdk8s-plus-33'
 
 const image = imageInfo['softctf-barqr-capmoo']['image']
 const tag = imageInfo['softctf-barqr-capmoo']['tag']
@@ -26,7 +29,7 @@ export const applyBarQRCapmooTemplate = (
     },
     spec: {
       destination: {
-        namespace: ChallengeNamespaceEnum.SOFTCTF_BARQR_CAPMOO,
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
         server: 'https://kubernetes.default.svc',
       },
       project: projectName,
@@ -46,10 +49,10 @@ export const applyBarQRCapmooTemplate = (
   })
 
   const chart = new Chart(app, 'softctf-barqr-capmoo', {
-    namespace: ChallengeNamespaceEnum.SOFTCTF_BARQR_CAPMOO,
+    namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
   })
 
-  new Secret(chart, 'barqr-capmoo-secret', {
+  const envSecret = new Secret(chart, 'barqr-capmoo-secret', {
     metadata: {
       name: 'barqr-capmoo-secret',
     },
@@ -59,81 +62,49 @@ export const applyBarQRCapmooTemplate = (
     },
   })
 
-  new KubeDeployment(chart, 'barqr-capmoo-deployment', {
+  const kubeDeployment = new Deployment(chart, 'barqr-capmoo-deployment', {
     metadata: {
       name: 'barqr-capmoo-app',
     },
-    spec: {
-      selector: {
-        matchLabels: {
-          app: 'barqr-capmoo-app',
-        },
-      },
-      replicas: 2,
-      template: {
-        metadata: {
-          labels: {
-            app: 'barqr-capmoo-app',
+    replicas: 3,
+    containers: [
+      {
+        image: `${image}:${tag}`,
+        name: 'barqr-capmoo-app',
+        ports: [{ number: 1337 }],
+        imagePullPolicy: ImagePullPolicy.IF_NOT_PRESENT,
+        envFrom: [Env.fromSecret(envSecret)],
+        resources: {
+          cpu: {
+            limit: Cpu.millis(100),
+            request: Cpu.millis(50),
+          },
+          memory: {
+            limit: Size.mebibytes(128),
+            request: Size.mebibytes(64),
           },
         },
-        spec: {
-          imagePullSecrets: [
-            {
-              name: 'regcred',
-            },
-          ],
-          containers: [
-            {
-              name: 'barqr-capmoo-app',
-              image: `${image}:${tag}`,
-              envFrom: [
-                {
-                  secretRef: {
-                    name: 'barqr-capmoo-secret',
-                  },
-                },
-              ],
-              ports: [
-                {
-                  containerPort: 1337,
-                },
-              ],
-              imagePullPolicy: 'IfNotPresent',
-              resources: {
-                limits: {
-                  cpu: Quantity.fromString('100m'),
-                  memory: Quantity.fromString('128Mi'),
-                },
-                requests: {
-                  cpu: Quantity.fromString('50m'),
-                  memory: Quantity.fromString('64Mi'),
-                },
-              },
-            },
-          ],
-        },
       },
-    },
+    ],
+    dockerRegistryAuth: Secret.fromSecretName(chart, 'regcred', 'regcred'),
+    restartPolicy: RestartPolicy.ON_FAILURE,
   })
 
-  new KubeService(chart, 'barqr-capmoo-service', {
-    metadata: {
-      name: 'barqr-capmoo-service',
-      namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
-      annotations: {},
-    },
-    spec: {
-      selector: {
-        app: 'barqr-capmoo-app',
+  return {
+    service: new Service(chart, 'barqr-capmoo-service', {
+      metadata: {
+        name: 'barqr-capmoo-service',
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
       },
+      type: ServiceType.CLUSTER_IP,
+      selector: kubeDeployment,
       ports: [
         {
-          name: 'tcp',
           port: 8085,
-          targetPort: IntOrString.fromNumber(1337),
+          targetPort: 1337,
+          name: 'tcp',
         },
       ],
-      type: 'NodePort',
-    },
-  })
+    }),
+  }
 }

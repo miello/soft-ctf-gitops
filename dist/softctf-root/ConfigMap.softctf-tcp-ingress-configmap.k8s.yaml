@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: softctf-tcp-ingress-configmap
+  namespace: ingress-nginx
+data:
+  "8081": softctf/are-you-real-service:8081
+  "8082": softctf/secure-secret-service:8082
+  "8083": softctf/super-secure-secret-service:8083
+  "8084": softctf/simple-math-service:8084
+  "8085": softctf/barqr-capmoo-service:8085
+immutable: false

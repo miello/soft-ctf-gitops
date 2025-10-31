@@ -1,20 +1,27 @@
-import { App, Chart } from 'cdk8s'
-import { ChallengeNamespaceEnum } from '../types/namespace'
-import {
-  IntOrString,
-  KubeDeployment,
-  KubeService,
-  Quantity,
-} from '../../imports/k8s'
+import { App, Chart, Size } from 'cdk8s'
+import { GlobalNamespaceEnum } from '../types/namespace'
 import imageInfo from '../images/simple-math.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
-import { Secret } from 'cdk8s-plus-33'
+import {
+  Cpu,
+  Deployment,
+  Env,
+  ImagePullPolicy,
+  RestartPolicy,
+  Secret,
+  Service,
+  ServiceType,
+} from 'cdk8s-plus-33'
 
 const image = imageInfo['softctf-simple-math']['image']
 const tag = imageInfo['softctf-simple-math']['tag']
 
-export const applySimpleMathTemplate = (app: App, rootChart: Chart, projectName: string) => {
+export const applySimpleMathTemplate = (
+  app: App,
+  rootChart: Chart,
+  projectName: string,
+) => {
   new Application(rootChart, 'argo-cd-application-simple-math', {
     metadata: {
       name: 'softctf-simple-math',
@@ -22,7 +29,7 @@ export const applySimpleMathTemplate = (app: App, rootChart: Chart, projectName:
     },
     spec: {
       destination: {
-        namespace: ChallengeNamespaceEnum.SOFTCTF_SIMPLE_MATH,
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
         server: 'https://kubernetes.default.svc',
       },
       project: projectName,
@@ -42,10 +49,10 @@ export const applySimpleMathTemplate = (app: App, rootChart: Chart, projectName:
   })
 
   const chart = new Chart(app, 'softctf-simple-math', {
-    namespace: ChallengeNamespaceEnum.SOFTCTF_SIMPLE_MATH,
+    namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
   })
 
-  new Secret(chart, 'simple-math-secret', {
+  const envSecret = new Secret(chart, 'simple-math-secret', {
     metadata: {
       name: 'simple-math-secret',
     },
@@ -55,82 +62,49 @@ export const applySimpleMathTemplate = (app: App, rootChart: Chart, projectName:
     },
   })
 
-  new KubeDeployment(chart, 'simple-math-deployment', {
+  const kubeDeployment = new Deployment(chart, 'simple-math-deployment', {
     metadata: {
       name: 'simple-math-app',
     },
-    spec: {
-      selector: {
-        matchLabels: {
-          app: 'simple-math-app',
-        },
-      },
-      replicas: 2,
-      template: {
-        metadata: {
-          labels: {
-            app: 'simple-math-app',
+    replicas: 3,
+    containers: [
+      {
+        image: `${image}:${tag}`,
+        name: 'simple-math-app',
+        ports: [{ number: 1337 }],
+        imagePullPolicy: ImagePullPolicy.IF_NOT_PRESENT,
+        envFrom: [Env.fromSecret(envSecret)],
+        resources: {
+          cpu: {
+            limit: Cpu.millis(100),
+            request: Cpu.millis(50),
+          },
+          memory: {
+            limit: Size.mebibytes(128),
+            request: Size.mebibytes(64),
           },
         },
-        spec: {
-          imagePullSecrets: [
-            {
-              name: 'regcred',
-            }
-          ],
-          containers: [
-            {
-              name: 'simple-math-app',
-              image: `${image}:${tag}`,
-              envFrom: [{
-                secretRef: {
-                  name: 'simple-math-secret',
-                }
-              }],
-              ports: [
-                {
-                  containerPort: 1337,
-                },
-              ],
-              imagePullPolicy: 'IfNotPresent',
-              resources: {
-                limits: {
-                  cpu: Quantity.fromString('100m'),
-                  memory: Quantity.fromString('128Mi'),
-                },
-                requests: {
-                  cpu: Quantity.fromString('50m'),
-                  memory: Quantity.fromString('64Mi'),
-                },
-              },
-            },
-          ],
-        },
       },
-    },
+    ],
+    dockerRegistryAuth: Secret.fromSecretName(chart, 'regcred', 'regcred'),
+    restartPolicy: RestartPolicy.ON_FAILURE,
   })
 
-  new KubeService(chart, 'simple-math-service', {
-    metadata: {
-      name: 'simple-math-service',
-      namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
-      annotations: {
-        
-      }
-    },
-    spec: {
-      selector: {
-        app: 'simple-math-app',
+  return {
+    service: new Service(chart, 'simple-math-service', {
+      metadata: {
+        name: 'simple-math-service',
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
       },
+      type: ServiceType.CLUSTER_IP,
+      selector: kubeDeployment,
       ports: [
         {
-          name: 'tcp',
           port: 8084,
-          targetPort: IntOrString.fromNumber(1337),
+          targetPort: 1337,
+          name: 'tcp',
         },
       ],
-      type: 'NodePort',
-    },
-  })
+    }),
+  }
 }
- 

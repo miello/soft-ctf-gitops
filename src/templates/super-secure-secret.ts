@@ -1,20 +1,27 @@
-import { App, Chart } from 'cdk8s'
-import { ChallengeNamespaceEnum } from '../types/namespace'
-import {
-  IntOrString,
-  KubeDeployment,
-  KubeService,
-  Quantity,
-} from '../../imports/k8s'
+import { App, Chart, Size } from 'cdk8s'
+import { GlobalNamespaceEnum } from '../types/namespace'
 import imageInfo from '../images/super-secure-secret.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
-import { Secret } from 'cdk8s-plus-33'
+import {
+  Cpu,
+  Deployment,
+  Env,
+  ImagePullPolicy,
+  RestartPolicy,
+  Secret,
+  Service,
+  ServiceType,
+} from 'cdk8s-plus-33'
 
 const image = imageInfo['softctf-super-secure-secret']['image']
 const tag = imageInfo['softctf-super-secure-secret']['tag']
 
-export const applySuperSecureSecretTemplate = (app: App, rootChart: Chart, projectName: string) => {
+export const applySuperSecureSecretTemplate = (
+  app: App,
+  rootChart: Chart,
+  projectName: string,
+) => {
   new Application(rootChart, 'argo-cd-application-super-secure-secret', {
     metadata: {
       name: 'softctf-super-secure-secret',
@@ -22,7 +29,7 @@ export const applySuperSecureSecretTemplate = (app: App, rootChart: Chart, proje
     },
     spec: {
       destination: {
-        namespace: ChallengeNamespaceEnum.SOFTCTF_SUPER_SECURE_SECRET,
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
         server: 'https://kubernetes.default.svc',
       },
       project: projectName,
@@ -42,10 +49,10 @@ export const applySuperSecureSecretTemplate = (app: App, rootChart: Chart, proje
   })
 
   const chart = new Chart(app, 'softctf-super-secure-secret', {
-    namespace: ChallengeNamespaceEnum.SOFTCTF_SUPER_SECURE_SECRET,
+    namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
   })
 
-  new Secret(chart, 'super-secure-secret-secret', {
+  const envSecret = new Secret(chart, 'super-secure-secret-secret', {
     metadata: {
       name: 'super-secure-secret-secret',
     },
@@ -55,79 +62,53 @@ export const applySuperSecureSecretTemplate = (app: App, rootChart: Chart, proje
     },
   })
 
-  new KubeDeployment(chart, 'super-secure-secret-deployment', {
-    metadata: {
-      name: 'super-secure-secret-app',
-    },
-    spec: {
-      selector: {
-        matchLabels: {
-          app: 'super-secure-secret-app',
-        },
+  const kubeDeployment = new Deployment(
+    chart,
+    'super-secure-secret-deployment',
+    {
+      metadata: {
+        name: 'super-secure-secret-app',
       },
-      replicas: 2,
-      template: {
-        metadata: {
-          labels: {
-            app: 'super-secure-secret-app',
+      replicas: 3,
+      containers: [
+        {
+          image: `${image}:${tag}`,
+          name: 'super-secure-secret-app',
+          ports: [{ number: 1337 }],
+          imagePullPolicy: ImagePullPolicy.IF_NOT_PRESENT,
+          envFrom: [Env.fromSecret(envSecret)],
+          resources: {
+            cpu: {
+              limit: Cpu.millis(100),
+              request: Cpu.millis(50),
+            },
+            memory: {
+              limit: Size.mebibytes(128),
+              request: Size.mebibytes(64),
+            },
           },
         },
-        spec: {
-          imagePullSecrets: [
-            {
-              name: 'regcred',
-            }
-          ],
-          containers: [
-            {
-              name: 'super-secure-secret-app',
-              image: `${image}:${tag}`,
-              envFrom: [{
-                secretRef: {
-                  name: 'super-secure-secret-secret',
-                }
-              }],
-              ports: [
-                {
-                  containerPort: 1337,
-                },
-              ],
-              imagePullPolicy: 'IfNotPresent',
-              resources: {
-                limits: {
-                  cpu: Quantity.fromString('100m'),
-                  memory: Quantity.fromString('128Mi'),
-                },
-                requests: {
-                  cpu: Quantity.fromString('50m'),
-                  memory: Quantity.fromString('64Mi'),
-                },
-              },
-            },
-          ],
-        },
-      },
+      ],
+      dockerRegistryAuth: Secret.fromSecretName(chart, 'regcred', 'regcred'),
+      restartPolicy: RestartPolicy.ON_FAILURE,
     },
-  })
+  )
 
-  new KubeService(chart, 'super-secure-secret-service', {
-    metadata: {
-      name: 'super-secure-secret-service',
-      namespace: ChallengeNamespaceEnum.SOFTCTF_SUPER_SECURE_SECRET,
-    },
-    spec: {
-      selector: {
-        app: 'super-secure-secret-app',
+  return {
+    service: new Service(chart, 'super-secure-secret-service', {
+      metadata: {
+        name: 'super-secure-secret-service',
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
       },
+      type: ServiceType.CLUSTER_IP,
+      selector: kubeDeployment,
       ports: [
         {
-          name: 'tcp',
           port: 8083,
-          targetPort: IntOrString.fromNumber(1337),
+          targetPort: 1337,
+          name: 'tcp',
         },
       ],
-      type: 'NodePort',
-    },
-  })
+    }),
+  }
 }
- 

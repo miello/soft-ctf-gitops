@@ -2,17 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: are-you-real-app
-  namespace: softctf-are-you-real
+  namespace: softctf
 spec:
-  replicas: 2
+  minReadySeconds: 0
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: are-you-real-app
+      cdk8s.io/metadata.addr: softctf-are-you-real-are-you-real-deployment-c8b9601c
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
       labels:
-        app: are-you-real-app
+        cdk8s.io/metadata.addr: softctf-are-you-real-are-you-real-deployment-c8b9601c
     spec:
+      automountServiceAccountToken: false
       containers:
         - envFrom:
             - secretRef:
@@ -29,5 +38,19 @@ spec:
             requests:
               cpu: 50m
               memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      dnsPolicy: ClusterFirst
+      hostNetwork: false
       imagePullSecrets:
         - name: regcred
+      restartPolicy: OnFailure
+      securityContext:
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
+      setHostnameAsFQDN: false
+      shareProcessNamespace: false
+      terminationGracePeriodSeconds: 30

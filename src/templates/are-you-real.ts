@@ -1,15 +1,18 @@
-import { App, Chart } from 'cdk8s'
-import { ChallengeNamespaceEnum } from '../types/namespace'
-import {
-  IntOrString,
-  KubeDeployment,
-  KubeService,
-  Quantity,
-} from '../../imports/k8s'
+import { App, Chart, Size } from 'cdk8s'
+import { GlobalNamespaceEnum } from '../types/namespace'
 import imageInfo from '../images/are-you-real.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
-import { Secret } from 'cdk8s-plus-33'
+import {
+  Secret,
+  Service,
+  Deployment,
+  Cpu,
+  Env,
+  ImagePullPolicy,
+  RestartPolicy,
+  ServiceType,
+} from 'cdk8s-plus-33'
 
 const image = imageInfo['softctf-are-you-real']['image']
 const tag = imageInfo['softctf-are-you-real']['tag']
@@ -26,7 +29,7 @@ export const applyAreYouRealTemplate = (
     },
     spec: {
       destination: {
-        namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
         server: 'https://kubernetes.default.svc',
       },
       project: projectName,
@@ -46,10 +49,10 @@ export const applyAreYouRealTemplate = (
   })
 
   const chart = new Chart(app, 'softctf-are-you-real', {
-    namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
+    namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
   })
 
-  new Secret(chart, 'are-you-real-secret', {
+  const envSecret = new Secret(chart, 'are-you-real-secret', {
     metadata: {
       name: 'are-you-real-secret',
     },
@@ -59,80 +62,49 @@ export const applyAreYouRealTemplate = (
     },
   })
 
-  new KubeDeployment(chart, 'are-you-real-deployment', {
+  const kubeDeployment = new Deployment(chart, 'are-you-real-deployment', {
     metadata: {
       name: 'are-you-real-app',
     },
-    spec: {
-      selector: {
-        matchLabels: {
-          app: 'are-you-real-app',
-        },
-      },
-      replicas: 2,
-      template: {
-        metadata: {
-          labels: {
-            app: 'are-you-real-app',
+    replicas: 3,
+    containers: [
+      {
+        image: `${image}:${tag}`,
+        name: 'are-you-real-app',
+        ports: [{ number: 1337 }],
+        imagePullPolicy: ImagePullPolicy.IF_NOT_PRESENT,
+        envFrom: [Env.fromSecret(envSecret)],
+        resources: {
+          cpu: {
+            limit: Cpu.millis(100),
+            request: Cpu.millis(50),
+          },
+          memory: {
+            limit: Size.mebibytes(128),
+            request: Size.mebibytes(64),
           },
         },
-        spec: {
-          imagePullSecrets: [
-            {
-              name: 'regcred',
-            },
-          ],
-          containers: [
-            {
-              name: 'are-you-real-app',
-              image: `${image}:${tag}`,
-              envFrom: [
-                {
-                  secretRef: {
-                    name: 'are-you-real-secret',
-                  },
-                },
-              ],
-              ports: [
-                {
-                  containerPort: 1337,
-                },
-              ],
-              imagePullPolicy: 'IfNotPresent',
-              resources: {
-                limits: {
-                  cpu: Quantity.fromString('100m'),
-                  memory: Quantity.fromString('128Mi'),
-                },
-                requests: {
-                  cpu: Quantity.fromString('50m'),
-                  memory: Quantity.fromString('64Mi'),
-                },
-              },
-            },
-          ],
-        },
       },
-    },
+    ],
+    dockerRegistryAuth: Secret.fromSecretName(chart, 'regcred', 'regcred'),
+    restartPolicy: RestartPolicy.ON_FAILURE,
   })
 
-  new KubeService(chart, 'are-you-real-service', {
-    metadata: {
-      name: 'are-you-real-service',
-      namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_REAL,
-    },
-    spec: {
-      selector: {
-        app: 'are-you-real-app',
+  return {
+    service: new Service(chart, 'are-you-real-service', {
+      metadata: {
+        name: 'are-you-real-service',
+        namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
       },
+      type: ServiceType.CLUSTER_IP,
+      selector: kubeDeployment,
       ports: [
         {
-          name: 'tcp',
           port: 8081,
-          targetPort: IntOrString.fromNumber(1337),
+          targetPort: 1337,
+          name: 'tcp',
         },
       ],
-      type: 'NodePort',
-    },
-  })
+    }),
+  }
 }
