@@ -26,7 +26,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: softctf-glossary-shop-glossary-shop-secret-c869a684
-          image: ghcr.io/miello/softctf-glossary-shop:5b7b5fc15c8fdf9182d359e99d33d48c97285330
+          image: ghcr.io/miello/softctf-glossary-shop:36fcf29144f324e003cc2ca3843e22674052559e
           imagePullPolicy: IfNotPresent
           name: glossary-shop-app
           ports:
