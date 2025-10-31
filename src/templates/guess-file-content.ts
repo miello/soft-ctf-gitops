@@ -80,7 +80,6 @@ export const applyGuessFileContentTemplate = (
           securityContext: {
             ensureNonRoot: true,
             user: 1000,
-            readOnlyRootFilesystem: true,
           },
         },
       ],
