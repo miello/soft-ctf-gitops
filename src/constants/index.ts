@@ -1,0 +1,1 @@
+export const REPOSITORY_URL = 'https://github.com/miello/soft-ctf-gitops'

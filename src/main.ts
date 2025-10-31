@@ -4,6 +4,7 @@ import { AppProject } from '../imports/argocd-appproject-argoproj.io'
 import { ChallengeNamespaceEnum } from './types/namespace'
 import { IntOrString, KubeDeployment, KubeService, Quantity } from '../imports/k8s'
 import { IngressRoute, IngressRouteSpecRoutesKind, IngressRouteSpecRoutesServicesPort } from '../imports/traefik-ingressroutes-traefik.io'
+import { applyAreYouRealTemplate } from './templates/are-you-real'
 
 const repositoryUrl = 'https://github.com/miello/soft-ctf-gitops'
 const app = new App({
@@ -34,125 +35,6 @@ const mainProject = new AppProject(appChart, 'argo-cd-project', {
   },
 })
 
-new Application(appChart, 'argo-cd-application', {
-  metadata: {
-    name: 'soft-ctf-are-you-ready',
-    namespace: 'argocd',
-  },
-  spec: {
-    destination: {
-      namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_READY,
-      server: 'https://kubernetes.default.svc',
-    },
-    project: mainProject.name,
-    source: {
-      repoUrl: repositoryUrl,
-      targetRevision: 'main',
-      path: 'dist/softctf-are-you-ready',
-    },
-    syncPolicy: {
-      syncOptions: ['CreateNamespace=true'],
-      automated: {
-        prune: true,
-        selfHeal: true,
-      },
-    },
-  },
-})
-
-const AreYouReadyChart = new Chart(app, 'softctf-are-you-ready', {
-  namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_READY,
-})
-
-new KubeDeployment(AreYouReadyChart, 'are-you-ready-app', {
-  metadata: {
-    name: 'are-you-ready-app',
-  },
-  spec: {
-    selector: {
-      matchLabels: {
-        app: 'are-you-ready-app',
-      },
-    },
-    replicas: 1,
-    template: {
-      metadata: {
-        labels: {
-          app: 'are-you-ready-app',
-        },
-      },
-      spec: {
-        containers: [
-          {
-            name: 'are-you-ready-app',
-            image: 'nginx:latest',
-            ports: [
-              {
-                containerPort: 80,
-              },
-            ],
-            resources: {
-              limits: {
-                cpu: Quantity.fromString('100m'),
-                memory: Quantity.fromString('128Mi'),
-              },
-              requests: {
-                cpu: Quantity.fromString('50m'),
-                memory: Quantity.fromString('128Mi'),
-              },
-            }
-          },
-        ],
-      },
-    },
-  },
-})
-
-new KubeService(AreYouReadyChart, 'are-you-ready', {
-  metadata: {
-    name: 'are-you-ready-service',
-    namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_READY,
-  },
-  spec: {
-    selector: {
-      app: 'are-you-ready-app',
-    },
-    ports: [
-      {
-        name: 'http',
-        port: 80,
-        targetPort: IntOrString.fromNumber(80),
-      },
-      {
-        name: 'https',
-        port: 443,
-        targetPort: IntOrString.fromNumber(443),
-      }
-    ],
-    type: 'ClusterIP',
-  },
-})
-
-new IngressRoute(AreYouReadyChart, 'are-you-ready-ingress', {
-  metadata: {
-    name: 'are-you-ready-ingress',
-    namespace: ChallengeNamespaceEnum.SOFTCTF_ARE_YOU_READY,
-  },
-  spec: {
-    entryPoints: ['web', 'websecure'],
-    routes: [
-      {
-        match: 'Host(`test-database-helloworld.miello.dev`)',
-        kind: IngressRouteSpecRoutesKind.RULE,
-        services: [
-          {
-            name: 'are-you-ready-service',
-            port: IngressRouteSpecRoutesServicesPort.fromNumber(80),
-          },
-        ],
-      },
-    ],
-  },
-})
+applyAreYouRealTemplate(app, appChart, mainProject.name)
 
 app.synth()
