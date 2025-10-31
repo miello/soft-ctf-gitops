@@ -86,6 +86,8 @@ export const applyAreYouRealTemplate = (
         },
         securityContext: {
           ensureNonRoot: true,
+          user: 1000,
+          readOnlyRootFilesystem: true,
         }
       },
     ],

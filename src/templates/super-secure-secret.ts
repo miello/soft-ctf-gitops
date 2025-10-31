@@ -89,6 +89,8 @@ export const applySuperSecureSecretTemplate = (
           },
           securityContext: {
             ensureNonRoot: true,
+            user: 1000,
+            readOnlyRootFilesystem: true,
           },
         },
       ],

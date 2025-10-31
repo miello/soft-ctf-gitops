@@ -85,6 +85,8 @@ export const applySecureSecretTemplate = (
         },
         securityContext: {
           ensureNonRoot: true,
+          user: 1000,
+          readOnlyRootFilesystem: true,
         },
       },
     ],
