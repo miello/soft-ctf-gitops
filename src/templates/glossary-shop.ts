@@ -89,9 +89,7 @@ export const applyGlossaryShopTemplate = (
           },
         },
         securityContext: {
-          ensureNonRoot: true,
           readOnlyRootFilesystem: false,
-          user: 1000,
         },
       },
     ],
@@ -151,7 +149,9 @@ export const applyGlossaryShopTemplate = (
             },
           },
           securityContext: {
+            ensureNonRoot: true,
             readOnlyRootFilesystem: false,
+            user: 1000,
           },
         },
       ],
