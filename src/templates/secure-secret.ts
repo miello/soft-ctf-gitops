@@ -3,7 +3,15 @@ import { GlobalNamespaceEnum } from '../types/namespace'
 import imageInfo from '../images/secure-secret.json'
 import { Application } from '../../imports/argocd-application-argoproj.io'
 import { REPOSITORY_URL } from '../constants'
-import { Secret, Deployment, Service, ServiceType, ImagePullPolicy, Cpu, RestartPolicy, Env } from 'cdk8s-plus-33'
+import {
+  Secret,
+  Deployment,
+  Service,
+  ServiceType,
+  ImagePullPolicy,
+  Cpu,
+  Env,
+} from 'cdk8s-plus-33'
 
 const image = imageInfo['softctf-secure-secret']['image']
 const tag = imageInfo['softctf-secure-secret']['tag']
@@ -58,25 +66,28 @@ export const applySecureSecretTemplate = (
       name: 'secure-secret-app',
     },
     replicas: 3,
-    containers: [{
-      image: `${image}:${tag}`,
-      name: 'secure-secret-app',
-      ports: [{ number: 1337 }],
-      imagePullPolicy: ImagePullPolicy.IF_NOT_PRESENT,
-      envFrom: [
-        Env.fromSecret(envSecret)
-      ],
-      resources: {
-        cpu: {
-          limit: Cpu.millis(100),
-          request: Cpu.millis(50),
+    containers: [
+      {
+        image: `${image}:${tag}`,
+        name: 'secure-secret-app',
+        ports: [{ number: 1337 }],
+        imagePullPolicy: ImagePullPolicy.IF_NOT_PRESENT,
+        envFrom: [Env.fromSecret(envSecret)],
+        resources: {
+          cpu: {
+            limit: Cpu.millis(100),
+            request: Cpu.millis(50),
+          },
+          memory: {
+            limit: Size.mebibytes(128),
+            request: Size.mebibytes(64),
+          },
         },
-        memory: {
-          limit: Size.mebibytes(128),
-          request: Size.mebibytes(64),
+        securityContext: {
+          ensureNonRoot: true,
         },
-      }
-    }],
+      },
+    ],
     dockerRegistryAuth: Secret.fromSecretName(chart, 'regcred', 'regcred'),
   })
 
@@ -93,8 +104,8 @@ export const applySecureSecretTemplate = (
           port: 8082,
           targetPort: 1337,
           name: 'tcp',
-        }
+        },
       ],
-    })
+    }),
   }
 }

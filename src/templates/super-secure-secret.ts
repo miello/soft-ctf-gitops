@@ -87,6 +87,9 @@ export const applySuperSecureSecretTemplate = (
               request: Size.mebibytes(64),
             },
           },
+          securityContext: {
+            ensureNonRoot: true,
+          },
         },
       ],
       dockerRegistryAuth: Secret.fromSecretName(chart, 'regcred', 'regcred'),
