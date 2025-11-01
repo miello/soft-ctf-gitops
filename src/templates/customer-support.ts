@@ -98,7 +98,7 @@ export const applyCustomerSupportTemplate = (
     ports: [
       {
         port: 80,
-        targetPort: 80,
+        targetPort: 8090,
         name: 'http',
       },
     ],

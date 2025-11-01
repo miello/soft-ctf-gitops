@@ -8,7 +8,7 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 80
+      targetPort: 8090
   selector:
     cdk8s.io/metadata.addr: softctf-customer-support-customer-support-deployment-c88c8783
   type: ClusterIP
