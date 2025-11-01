@@ -121,7 +121,7 @@ export const applyGlossaryShopTemplate = (
 
   const glossaryShopSecret = new Secret(chart, 'glossary-shop-secret', {
     stringData: {
-      DATABASE_URL: `postgresql://glossary_user:supersecurepassword@glossary-shop-db-service:5432/glossary`,
+      DATABASE_URL: `postgresql://glossary_user:supersecurepassword@${dbService.name}:5432/glossary`,
       MODE: "production",
 
       API_BASE_URL: "http://localhost:3000/api",
