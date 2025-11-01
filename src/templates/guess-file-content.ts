@@ -108,18 +108,8 @@ export const applyGuessFileContentTemplate = (
     metadata: {
       name: 'guess-file-content-ingress',
       namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
-      annotations: {
-        'cert-manager.io/cluster-issuer': 'letsencrypt-softctf',
-        'nginx.ingress.kubernetes.io/force-ssl-redirect': 'true',
-      }
     },
     className: 'nginx',
-    tls: [
-      {
-        hosts: ['softctf-guess-file-content.miello.dev'],
-        secret: TlsSecret.fromSecretName(chart, 'guess-file-content-tls', 'guess-file-content-tls'),
-      },
-    ],
     rules: [
       {
         host: 'softctf-guess-file-content.miello.dev',

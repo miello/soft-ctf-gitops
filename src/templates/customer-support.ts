@@ -108,18 +108,8 @@ export const applyCustomerSupportTemplate = (
     metadata: {
       name: 'customer-support-ingress',
       namespace: GlobalNamespaceEnum.SOFTCTF_GLOBAL,
-      annotations: {
-        'cert-manager.io/cluster-issuer': 'letsencrypt-softctf',
-        'nginx.ingress.kubernetes.io/force-ssl-redirect': 'true',
-      }
     },
     className: 'nginx',
-    tls: [
-      {
-        hosts: ['softctf-customer-support.miello.dev'],
-        secret: TlsSecret.fromSecretName(chart, 'customer-support-tls', 'customer-support-tls'),
-      },
-    ],
     rules: [
       {
         host: 'softctf-customer-support.miello.dev',
