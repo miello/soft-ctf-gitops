@@ -98,7 +98,7 @@ export const applyGuessFileContentTemplate = (
     ports: [
       {
         port: 80,
-        targetPort: 80,
+        targetPort: 8080,
         name: 'tcp',
       },
     ],

@@ -8,7 +8,7 @@ spec:
   ports:
     - name: tcp
       port: 80
-      targetPort: 80
+      targetPort: 8080
   selector:
     cdk8s.io/metadata.addr: softctf-guess-file-conte-guess-file-content-deployment-c857a087
   type: ClusterIP
