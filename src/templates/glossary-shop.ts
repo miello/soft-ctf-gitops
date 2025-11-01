@@ -83,12 +83,12 @@ export const applyGlossaryShopTemplate = (
         imagePullPolicy: ImagePullPolicy.IF_NOT_PRESENT,
         resources: {
           cpu: {
-            limit: Cpu.millis(100),
+            limit: Cpu.millis(300),
             request: Cpu.millis(50),
           },
           memory: {
-            limit: Size.mebibytes(128),
-            request: Size.mebibytes(64),
+            limit: Size.mebibytes(512),
+            request: Size.mebibytes(256),
           },
         },
         securityContext: {

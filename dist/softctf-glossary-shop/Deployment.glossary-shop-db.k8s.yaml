@@ -33,11 +33,11 @@ spec:
             - containerPort: 5432
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 300m
+              memory: 512Mi
             requests:
               cpu: 50m
-              memory: 64Mi
+              memory: 256Mi
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
