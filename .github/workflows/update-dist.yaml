@@ -1,0 +1,44 @@
+name: Update cdk8s dist
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - '.github/workflows/update-dist.yaml'
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  update-dist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.9.0
+
+      - name: Setup node with cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Import cdk8s dependencies
+        run: pnpm run import
+
+      - name: Build cdk8s dist files
+        run: pnpm run build
+
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: update dist"
