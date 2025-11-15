@@ -8,7 +8,6 @@ import {
   Deployment,
   Env,
   ImagePullPolicy,
-  RestartPolicy,
   Secret,
   Service,
   ServiceType,

@@ -7,6 +7,9 @@ import { applySecureSecretTemplate } from './templates/secure-secret'
 import { applySimpleMathTemplate } from './templates/simple-math'
 import { applySuperSecureSecretTemplate } from './templates/super-secure-secret'
 import { ConfigMap, Protocol, Service, ServiceType } from 'cdk8s-plus-33'
+import { ClusterIssuer } from '../imports/cert-manager-clusterissuer-cert-manager.io'
+import { applyGuessFileContentTemplate } from './templates/guess-file-content'
+import { applyCustomerSupportTemplate } from './templates/customer-support'
 
 const app = new App({
   yamlOutputType: YamlOutputType.FOLDER_PER_CHART_FILE_PER_RESOURCE,
@@ -61,6 +64,16 @@ const simpleMathResult = applySimpleMathTemplate(
   mainProject.name,
 )
 const superSecureSecretResult = applySuperSecureSecretTemplate(
+  app,
+  appChart,
+  mainProject.name,
+)
+const customerSupportResult = applyCustomerSupportTemplate(
+  app,
+  appChart,
+  mainProject.name,
+)
+const guessFileContentResult = applyGuessFileContentTemplate(
   app,
   appChart,
   mainProject.name,

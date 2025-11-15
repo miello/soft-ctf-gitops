@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-softctf
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  name: customer-support-ingress
+  namespace: softctf
+spec:
+  rules:
+    - host: softctf-customer-support.miello.dev
+      http:
+        paths:
+          - backend:
+              service:
+                name: customer-support-service
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - softctf-customer-support.miello.dev
+      secretName: customer-support-tls

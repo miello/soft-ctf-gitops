@@ -6,3 +6,4 @@ imports:
   - argocd-application:=https://raw.githubusercontent.com/argoproj/argo-cd/refs/tags/v3.1.9/manifests/crds/application-crd.yaml
   - traefik-middlewares:=https://raw.githubusercontent.com/traefik/traefik-helm-chart/refs/tags/v37.2.0/traefik-crds/crds-files/traefik/traefik.io_middlewares.yaml
   - traefik-ingressroutes:=https://raw.githubusercontent.com/traefik/traefik-helm-chart/refs/tags/v37.2.0/traefik-crds/crds-files/traefik/traefik.io_ingressroutes.yaml
+  - cert-manager-clusterissuer:=https://raw.githubusercontent.com/cert-manager/cert-manager/refs/tags/v1.19.1/deploy/crds/cert-manager.io_clusterissuers.yaml
